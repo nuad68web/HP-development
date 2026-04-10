@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNS自動化ダッシュボード</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 20px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .header h1 { font-size: 20px; color: #fff; }
+        .header .date { color: #888; font-size: 14px; }
+
+        .actions { padding: 15px 30px; display: flex; gap: 10px; }
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-primary { background: #4f46e5; color: #fff; }
+        .btn-primary:hover { background: #4338ca; }
+        .btn-success { background: #059669; color: #fff; }
+        .btn-success:hover { background: #047857; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-secondary { background: #333; color: #ccc; }
+        .btn-secondary:hover { background: #444; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .container { padding: 20px 30px; }
+        .accounts { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+
+        .account-card {
+            background: #1a1a1a; border: 1px solid #333; border-radius: 12px;
+            overflow: hidden; transition: border-color 0.2s;
+        }
+        .account-card:hover { border-color: #555; }
+
+        .card-header {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .acc1 .card-header { background: linear-gradient(135deg, #1a0a0a, #2d1515); border-bottom: 2px solid #dc2626; }
+        .acc2 .card-header { background: linear-gradient(135deg, #0a1a0a, #152d15); border-bottom: 2px solid #059669; }
+        .acc3 .card-header { background: linear-gradient(135deg, #0a0a1a, #15152d); border-bottom: 2px solid #7c3aed; }
+
+        .card-header h2 { font-size: 16px; }
+        .card-header .platforms { font-size: 12px; color: #888; }
+
+        .card-body { padding: 20px; }
+
+        .pipeline {
+            display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .pipeline-step {
+            padding: 6px 12px; border-radius: 20px; font-size: 12px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .step-pending { background: #333; color: #888; }
+        .step-ready { background: #1e3a5f; color: #60a5fa; }
+        .step-approved { background: #064e3b; color: #34d399; }
+        .step-processing { background: #78350f; color: #fbbf24; animation: pulse 1.5s infinite; }
+        .step-error { background: #7f1d1d; color: #fca5a5; }
+        .step-rejected { background: #4a1d1d; color: #f87171; }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        .content-preview {
+            background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
+            padding: 15px; margin-bottom: 15px; max-height: 300px; overflow-y: auto;
+        }
+        .content-preview h3 { font-size: 14px; color: #60a5fa; margin-bottom: 8px; }
+        .content-preview p { font-size: 13px; line-height: 1.6; color: #ccc; white-space: pre-wrap; }
+        .content-preview .label { font-size: 11px; color: #888; margin-top: 8px; }
+
+        .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .card-actions .btn { font-size: 12px; padding: 8px 14px; }
+
+        .feedback-input {
+            width: 100%; padding: 8px 12px; background: #111; border: 1px solid #333;
+            border-radius: 6px; color: #e0e0e0; font-size: 13px; margin-top: 8px;
+            display: none;
+        }
+        .feedback-input:focus { border-color: #4f46e5; outline: none; }
+
+        .status-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a;
+            border-top: 1px solid #333; padding: 10px 30px; display: flex;
+            justify-content: space-between; align-items: center; font-size: 13px;
+        }
+        .status-bar .message { color: #888; }
+        .status-bar .message.success { color: #34d399; }
+        .status-bar .message.error { color: #f87171; }
+
+        .loading { display: none; color: #fbbf24; }
+        .loading.active { display: inline; }
+
+        .hashtags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .hashtag { background: #1e293b; color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+
+        .empty-state { text-align: center; padding: 40px; color: #555; }
+        .empty-state p { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>SNS自動化ダッシュボード</h1>
+            <span class="date" id="currentDate"></span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <span class="loading" id="globalLoading">処理中...</span>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-primary" onclick="generateAll()">台本を一括生成</button>
+        <button class="btn btn-secondary" onclick="refreshContent()">更新</button>
+    </div>
+
+    <div class="container">
+        <div class="accounts" id="accountsContainer">
+            <div class="empty-state">
+                <p>読み込み中...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span class="message" id="statusMessage">準備完了</span>
+        <span id="lastUpdate"></span>
+    </div>
+
+    <script>
+        const STEP_LABELS = {
+            script: '台本', images: '画像', audio: '音声', video: '動画', posted: '投稿'
+        };
+        const STEP_ORDER = ['script', 'images', 'audio', 'video', 'posted'];
+        const ACC_CLASSES = { acc1_horror: 'acc1', acc2_money: 'acc2', acc3_influencer: 'acc3' };
+
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ja-JP', {
+            year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+        });
+
+        function setStatus(msg, type = '') {
+            const el = document.getElementById('statusMessage');
+            el.textContent = msg;
+            el.className = 'message ' + type;
+        }
+
+        function setLoading(on) {
+            document.getElementById('globalLoading').className = on ? 'loading active' : 'loading';
+        }
+
+        async function apiCall(url, method = 'GET', body = null) {
+            setLoading(true);
+            try {
+                const opts = { method, headers: { 'Content-Type': 'application/json' } };
+                if (body) opts.body = JSON.stringify(body);
+                const res = await fetch(url, opts);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || data.error || 'エラー');
+                return data;
+            } catch (e) {
+                setStatus('エラー: ' + e.message, 'error');
+                throw e;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function generateAll() {
+            setStatus('台本生成中...（1〜2分かかります）');
+            try {
+                const data = await apiCall('/api/generate', 'POST');
+                setStatus('台本生成完了！', 'success');
+                refreshContent();
+            } catch (e) {
+                setStatus('生成エラー: ' + e.message, 'error');
+            }
+        }
+
+        async function refreshContent() {
+            try {
+                const data = await apiCall('/api/content');
+                renderAccounts(data);
+                document.getElementById('lastUpdate').textContent = '最終更新: ' + new Date().toLocaleTimeString('ja-JP');
+                setStatus('準備完了');
+            } catch (e) {
+                // error already shown
+            }
+        }
+
+        function renderAccounts(data) {
+            const container = document.getElementById('accountsContainer');
+            container.innerHTML = '';
+
+            for (const [key, acc] of Object.entries(data)) {
+                const card = document.createElement('div');
+                card.className = `account-card ${ACC_CLASSES[key]}`;
+                card.innerHTML = renderCard(key, acc);
+                container.appendChild(card);
+            }
+        }
+
+        function renderCard(key, acc) {
+            const status = acc.status || {};
+            const content = acc.content;
+
+            let pipelineHtml = '<div class="pipeline">';
+            for (const step of STEP_ORDER) {
+                const state = status[step] || 'pending';
+                const icons = { pending: '○', ready: '●', approved: '✓', processing: '⟳', error: '✕', rejected: '✕' };
+                pipelineHtml += `<span class="pipeline-step step-${state}">${icons[state] || '○'} ${STEP_LABELS[step]}</span>`;
+            }
+            pipelineHtml += '</div>';
+
+            let contentHtml = '';
+            if (!content) {
+                contentHtml = '<div class="empty-state"><p>未生成 — 「台本を一括生成」ボタンを押してください</p></div>';
+            } else {
+                // ACC-1 & ACC-2: 台本表示
+                if (content.title) {
+                    contentHtml += `<div class="content-preview">`;
+                    contentHtml += `<h3>${content.title}</h3>`;
+                    if (content.hook) contentHtml += `<p class="label">フック:</p><p>${content.hook}</p>`;
+                    if (content.script) contentHtml += `<p class="label">台本:</p><p>${content.script}</p>`;
+                    if (content.hashtags_tiktok) {
+                        contentHtml += `<div class="hashtags">${content.hashtags_tiktok.map(h => `<span class="hashtag">${h}</span>`).join('')}</div>`;
+                    }
+                    contentHtml += `</div>`;
+                }
+                // ACC-3: インフルエンサー
+                if (content.feed_post) {
+                    contentHtml += `<div class="content-preview">`;
+                    contentHtml += `<h3>フィード投稿</h3>`;
+                    contentHtml += `<p class="label">シチュエーション:</p><p>${content.feed_post.description || '—'}</p>`;
+                    contentHtml += `<p class="label">キャプション:</p><p>${content.feed_post.caption || '—'}</p>`;
+                    if (content.feed_post.hashtags) {
+                        contentHtml += `<div class="hashtags">${content.feed_post.hashtags.map(h => `<span class="hashtag">${h}</span>`).join('')}</div>`;
+                    }
+                    contentHtml += `</div>`;
+                    if (content.story) {
+                        contentHtml += `<div class="content-preview">`;
+                        contentHtml += `<h3>ストーリー</h3>`;
+                        contentHtml += `<p>${content.story.text_overlay || content.story.description || '—'}</p>`;
+                        contentHtml += `</div>`;
+                    }
+                }
+            }
+
+            const currentStep = STEP_ORDER.find(s => (status[s] === 'ready' || status[s] === 'pending')) || 'posted';
+            const canApprove = content && (status[currentStep] === 'ready' || (currentStep === 'script' && status.script !== 'approved'));
+
+            let actionsHtml = '<div class="card-actions">';
+            if (canApprove || (content && currentStep === 'script')) {
+                actionsHtml += `<button class="btn btn-success" onclick="approve('${key}', '${currentStep}')">✓ ${STEP_LABELS[currentStep]}を承認</button>`;
+                actionsHtml += `<button class="btn btn-danger" onclick="showReject('${key}')">✕ 却下</button>`;
+            }
+            actionsHtml += `<button class="btn btn-secondary" onclick="regenerate('${key}')">再生成</button>`;
+            actionsHtml += '</div>';
+            actionsHtml += `<input class="feedback-input" id="feedback-${key}" placeholder="フィードバックを入力..." onkeydown="if(event.key==='Enter')submitReject('${key}')">`;
+
+            return `
+                <div class="card-header">
+                    <div>
+                        <h2>${acc.name}</h2>
+                        <span class="platforms">${acc.platforms.join(' / ')}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    ${pipelineHtml}
+                    ${contentHtml}
+                    ${actionsHtml}
+                </div>
+            `;
+        }
+
+        async function approve(accountKey, step) {
+            setStatus(`${STEP_LABELS[step]}を承認中...`);
+            try {
+                await apiCall(`/api/approve/${accountKey}/${step}`, 'POST');
+                setStatus('承認完了', 'success');
+                refreshContent();
+            } catch (e) {}
+        }
+
+        function showReject(accountKey) {
+            const input = document.getElementById(`feedback-${accountKey}`);
+            input.style.display = input.style.display === 'block' ? 'none' : 'block';
+            if (input.style.display === 'block') input.focus();
+        }
+
+        async function submitReject(accountKey) {
+            const input = document.getElementById(`feedback-${accountKey}`);
+            const feedback = input.value;
+            try {
+                await apiCall(`/api/reject/${accountKey}/script`, 'POST', { feedback });
+                setStatus('却下しました。再生成してください。');
+                input.style.display = 'none';
+                input.value = '';
+                refreshContent();
+            } catch (e) {}
+        }
+
+        async function regenerate(accountKey) {
+            setStatus('再生成中...');
+            try {
+                await apiCall(`/api/regenerate/${accountKey}`, 'POST', { feedback: '' });
+                setStatus('再生成完了', 'success');
+                refreshContent();
+            } catch (e) {}
+        }
+
+        // 初期読み込み
+        refreshContent();
+        // 30秒ごとに自動更新
+        setInterval(refreshContent, 30000);
+    </script>
+</body>
+</html>

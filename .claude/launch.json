@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static-server",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "/Users/ryo/Desktop/広研stg"],
+      "port": 8765
+    },
+    {
+      "name": "pokeca-investment",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/Users/ryo/Desktop/広研stg/pokeca-investment/app.py"],
+      "port": 5050
+    }
+  ]
+}
