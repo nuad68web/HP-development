@@ -450,8 +450,8 @@ a, button, [role="button"] { cursor: none; }
   font-weight: 700;
   margin: 0 0 10px;
   letter-spacing: 0.05em;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 26px;
   font-weight: 600;
   color: var(--black);
 }
@@ -467,6 +467,7 @@ a, button, [role="button"] { cursor: none; }
 .timeline dd strong {
   display: block;
   font-weight: 700;
+  font-size: 22px;
   margin: 4px 0 10px;
   letter-spacing: 0.05em;
 }
