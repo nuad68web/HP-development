@@ -148,6 +148,7 @@ a, button, [role="button"] { cursor: none; }
   color: var(--black);
   font-weight: 500;
   font-size: 13px;
+  white-space: nowrap;
   letter-spacing: 0.12em;
   position: relative;
   transition: opacity var(--transition-base);
@@ -701,7 +702,8 @@ a, button, [role="button"] { cursor: none; }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .site-header__inner { padding: 12px 20px; }
+  .site-header__inner { padding: 12px 16px; }
+  .nav__list { gap: 16px; }
   .nav__link { font-size: 11px; }
 
   .about-section,
