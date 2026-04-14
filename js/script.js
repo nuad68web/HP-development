@@ -1,4 +1,15 @@
 // ================================
+// Mobile Nav: close on link tap
+// ================================
+(function() {
+  const toggle = document.getElementById('nav-toggle');
+  if (!toggle) return;
+  document.querySelectorAll('.site-nav .nav__link').forEach(link => {
+    link.addEventListener('click', () => { toggle.checked = false; });
+  });
+})();
+
+// ================================
 // Custom Cursor
 // ================================
 (function() {
