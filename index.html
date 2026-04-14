@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/slider.css">
+  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/slider.css?v=5">
 </head>
 
 <body>
@@ -23,7 +23,9 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container site-header__inner">
-      <img src="img/広研ロゴ05.png" alt="NUADロゴ" class="site-header__logo">
+      <a href="#" class="site-header__logo-link" aria-label="ページトップへ">
+        <img src="img/広研ロゴ05.png" alt="NUADロゴ" class="site-header__logo">
+      </a>
       <input type="checkbox" id="nav-toggle" class="nav-toggle-checkbox" aria-hidden="true">
       <label for="nav-toggle" class="nav-toggle" aria-label="メニュー">
         <span></span><span></span><span></span>
@@ -31,6 +33,7 @@
       <label for="nav-toggle" class="nav-overlay" aria-hidden="true"></label>
       <nav class="site-nav" aria-label="メインナビゲーション">
         <ul class="nav__list">
+          <li class="nav__item"><a href="#" class="nav__link">トップ</a></li>
           <li class="nav__item"><a href="#about-section" class="nav__link">当会について</a></li>
           <li class="nav__item"><a href="#activities-section" class="nav__link">活動紹介</a></li>
           <li class="nav__item"><a href="#join-section" class="nav__link">入会について</a></li>
@@ -181,6 +184,6 @@
 
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="js/script.js"></script>
+  <script src="js/script.js?v=5"></script>
 </body>
 </html>
