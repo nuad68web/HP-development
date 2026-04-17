@@ -166,6 +166,92 @@ a, button, [role="button"] { cursor: none; }
 .nav__link:hover::after { width: 100%; }
 .nav__link:hover { opacity: 0.7; }
 
+/* ===== Sub-menu (活動紹介 dropdown) ===== */
+.nav__link--parent {
+  background: none;
+  border: none;
+  font-family: inherit;
+  color: var(--black);
+  font-weight: 500;
+  font-size: 13px;
+  white-space: nowrap;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  position: relative;
+  transition: opacity var(--transition-base);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav__link--parent::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 1px;
+  background: var(--black);
+  transition: width var(--transition-base);
+}
+.nav__link--parent:hover::after { width: 100%; }
+.nav__link--parent:hover { opacity: 0.7; }
+
+.nav__arrow {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-right: 1.5px solid var(--black);
+  border-bottom: 1.5px solid var(--black);
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+  margin-left: 2px;
+  position: relative;
+  top: -1px;
+}
+.nav__item--has-sub.is-open .nav__arrow {
+  transform: rotate(-135deg);
+  top: 2px;
+}
+
+.nav__item--has-sub { position: relative; }
+
+.nav__sub {
+  list-style: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  padding: 8px 0;
+  min-width: 140px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  z-index: 200;
+}
+.nav__item--has-sub:hover .nav__sub,
+.nav__item--has-sub.is-open .nav__sub {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav__sub-link {
+  display: block;
+  padding: 8px 20px;
+  text-decoration: none;
+  color: var(--black);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+.nav__sub-link:hover {
+  background: var(--gray-100);
+  opacity: 0.7;
+}
+
 /* ===== Hamburger (mobile only) ===== */
 .nav-toggle-checkbox { display: none; }
 .nav-overlay { display: none; }
@@ -814,6 +900,56 @@ a, button, [role="button"] { cursor: none; }
   .nav__link::after {
     bottom: 2px;
     background: var(--black);
+  }
+
+  /* Mobile sub-menu (accordion style) */
+  .nav__link--parent {
+    font-size: 17px;
+    letter-spacing: 0.14em;
+    padding: 6px 0;
+  }
+  .nav__link--parent::after { bottom: 2px; }
+  .nav__arrow {
+    width: 7px; height: 7px;
+    margin-left: 6px;
+  }
+  .nav__sub {
+    position: static;
+    transform: none;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    min-width: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 1;
+    visibility: visible;
+    transition: max-height 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+    margin-top: 0;
+  }
+  .nav__item--has-sub:hover .nav__sub {
+    max-height: 0;
+    transform: none;
+  }
+  .nav__item--has-sub.is-open .nav__sub {
+    max-height: 200px;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    margin-top: 8px;
+  }
+  .nav__sub-link {
+    font-size: 15px;
+    padding: 6px 0 6px 16px;
+    position: relative;
+  }
+  .nav__sub-link::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    width: 8px; height: 1px;
+    background: var(--gray-400);
   }
 
   .about-section,

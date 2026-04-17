@@ -1,11 +1,29 @@
 // ================================
-// Mobile Nav: close on link tap
+// Mobile Nav: close on link tap + sub-menu toggle
 // ================================
 (function() {
   const toggle = document.getElementById('nav-toggle');
   if (!toggle) return;
-  document.querySelectorAll('.site-nav .nav__link').forEach(link => {
-    link.addEventListener('click', () => { toggle.checked = false; });
+
+  // Close menu when a regular nav link is tapped
+  document.querySelectorAll('.site-nav .nav__link:not(.nav__link--parent)').forEach(function(link) {
+    link.addEventListener('click', function() { toggle.checked = false; });
+  });
+
+  // Close menu when a sub-link is tapped
+  document.querySelectorAll('.site-nav .nav__sub-link').forEach(function(link) {
+    link.addEventListener('click', function() { toggle.checked = false; });
+  });
+
+  // Sub-menu accordion toggle (mobile)
+  document.querySelectorAll('.nav__link--parent').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var parent = btn.closest('.nav__item--has-sub');
+      if (!parent) return;
+      var isOpen = parent.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
   });
 })();
 
