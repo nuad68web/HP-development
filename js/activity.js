@@ -37,11 +37,26 @@
 // Page Transition
 // ================================
 (function() {
-  const overlay = document.createElement('div');
-  overlay.className = 'page-transition';
-  document.body.prepend(overlay);
+  let overlay = document.getElementById('page-transition');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'page-transition';
+    document.body.prepend(overlay);
+  }
 
   setTimeout(() => { overlay.style.display = 'none'; }, 1100);
+
+  // Back/forward (bfcache restore): Safari restores the page with the
+  // outgoing black overlay still covering it, so reset and replay the reveal
+  window.addEventListener('pageshow', e => {
+    if (e.persisted) {
+      overlay.className = '';
+      overlay.removeAttribute('style');
+      void overlay.offsetWidth;
+      overlay.className = 'page-transition';
+      setTimeout(() => { overlay.style.display = 'none'; }, 1100);
+    }
+  });
 
   document.querySelectorAll('a[href]').forEach(link => {
     const href = link.getAttribute('href');
