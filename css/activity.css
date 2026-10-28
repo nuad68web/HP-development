@@ -352,12 +352,12 @@ a, button, [role="button"] { cursor: none; }
 }
 .item:hover { transform: translateY(-6px); }
 
-.top-row .item { flex-basis: 30%; }
+.top-row .item { flex-basis: 32%; }
 .bottom-row { justify-content: center; }
 .bottom-row .item { flex-basis: 40%; margin: 0 20px; }
 
 .item-title {
-  font-size: 1.05em;
+  font-size: 1.2em;
   font-weight: 700;
   margin: 0 0 12px;
   line-height: 1.4;
@@ -366,7 +366,7 @@ a, button, [role="button"] { cursor: none; }
 
 .item-image {
   width: 100%;
-  max-width: 250px;
+  max-width: 320px;
   height: auto;
   display: block;
   margin: 0 auto 14px;
@@ -378,7 +378,7 @@ a, button, [role="button"] { cursor: none; }
 .item-description {
   line-height: 1.8;
   color: var(--gray-700);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 /* ===== Competition Cards ===== */
